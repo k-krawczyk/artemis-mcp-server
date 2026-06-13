@@ -57,7 +57,8 @@ function parseAmqpUrl(raw: string): Pick<AmqpConfig, 'host' | 'port' | 'transpor
 }
 
 export function loadConfig(env: NodeJS.ProcessEnv = process.env): Config {
-  loadEnv();
+  // stdout is reserved for the MCP protocol, so dotenv must not print to it.
+  loadEnv({ quiet: true });
   const parsed = envSchema.safeParse(env);
   if (!parsed.success) {
     const issues = parsed.error.issues

@@ -42,7 +42,9 @@ describe('artemis broker integration', () => {
         EXTRA_ARGS: '--http-host 0.0.0.0 --relax-jolokia',
       })
       .withExposedPorts(5672, 8161)
-      .withWaitStrategy(Wait.forLogMessage(/Server is now live/, 1))
+      // AMQ241004 is logged once the console (and the Jolokia endpoint this
+      // server depends on) is reachable, which is later than "Server is active".
+      .withWaitStrategy(Wait.forLogMessage(/AMQ241004/, 1))
       .withStartupTimeout(180_000)
       .start();
 
@@ -90,10 +92,24 @@ describe('artemis broker integration', () => {
     await container?.stop();
   });
 
-  it('creates a queue and lists it', async () => {
+  it('creates queues and lists them', async () => {
     await call(ctx, 'create_queue', { name: 'orders', routingType: 'anycast' });
+    await call(ctx, 'create_queue', { name: 'archive', routingType: 'anycast' });
     const listed = await call(ctx, 'list_queues', {});
     expect(listed.queues).toContain('orders');
+    expect(listed.queues).toContain('archive');
+  });
+
+  it('lists addresses', async () => {
+    const listed = await call(ctx, 'list_addresses', {});
+    expect(listed.addresses).toContain('orders');
+  });
+
+  it('reports queue configuration', async () => {
+    const info = await call(ctx, 'get_queue_info', { queue: 'orders' });
+    expect(info.address).toBe('orders');
+    expect(info.routingType).toBe('ANYCAST');
+    expect(info.durable).toBe(true);
   });
 
   it('sends a message and reflects it in the queue stats', async () => {
@@ -120,11 +136,56 @@ describe('artemis broker integration', () => {
     expect(stats.messageCount).toBe(1);
   });
 
+  it('lists consumers and connections', async () => {
+    const consumers = await call(ctx, 'list_consumers', {});
+    expect(typeof consumers.count).toBe('number');
+    const connections = await call(ctx, 'list_connections', {});
+    expect(typeof connections.count).toBe('number');
+  });
+
   it('consumes and removes the message', async () => {
     const consumed = await call(ctx, 'consume_message', { queue: 'orders', count: 5 });
     expect(consumed.count).toBe(1);
     const stats = await call(ctx, 'get_queue_stats', { queue: 'orders' });
     expect(stats.messageCount).toBe(0);
+  });
+
+  it('moves messages between queues', async () => {
+    await call(ctx, 'send_message', { address: 'orders', body: 'a' });
+    await call(ctx, 'send_message', { address: 'orders', body: 'b' });
+    const moved = await call(ctx, 'move_messages', {
+      queue: 'orders',
+      targetQueue: 'archive',
+      confirm: true,
+    });
+    expect(moved.moved).toBe(2);
+    expect((await call(ctx, 'get_queue_stats', { queue: 'orders' })).messageCount).toBe(0);
+    expect((await call(ctx, 'get_queue_stats', { queue: 'archive' })).messageCount).toBe(2);
+    await call(ctx, 'purge_queue', { queue: 'archive', confirm: true });
+  });
+
+  it('deletes messages matching a filter', async () => {
+    await call(ctx, 'send_message', { address: 'orders', body: 'keep' });
+    await call(ctx, 'send_message', {
+      address: 'orders',
+      body: 'drop',
+      properties: { batch: 'old' },
+    });
+    const deleted = await call(ctx, 'delete_messages', {
+      queue: 'orders',
+      filter: "batch = 'old'",
+      confirm: true,
+    });
+    expect(deleted.removed).toBe(1);
+    expect((await call(ctx, 'get_queue_stats', { queue: 'orders' })).messageCount).toBe(1);
+    await call(ctx, 'purge_queue', { queue: 'orders', confirm: true });
+  });
+
+  it('retries dead-letter messages', async () => {
+    await call(ctx, 'send_message', { address: 'DLQ', body: 'failed' });
+    const retried = await call(ctx, 'retry_dlq', { queue: 'DLQ', confirm: true });
+    expect(typeof retried.retried).toBe('number');
+    await call(ctx, 'purge_queue', { queue: 'DLQ', confirm: true });
   });
 
   it('refuses to purge without confirm', async () => {
@@ -145,9 +206,11 @@ describe('artemis broker integration', () => {
     expect(overview.queueCount).toBeGreaterThan(0);
   });
 
-  it('deletes the queue', async () => {
+  it('deletes the queues', async () => {
     await call(ctx, 'delete_queue', { name: 'orders', confirm: true });
+    await call(ctx, 'delete_queue', { name: 'archive', confirm: true });
     const listed = await call(ctx, 'list_queues', {});
     expect(listed.queues).not.toContain('orders');
+    expect(listed.queues).not.toContain('archive');
   });
 });

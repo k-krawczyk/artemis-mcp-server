@@ -107,6 +107,16 @@ export function queueSearchPattern(broker: string, queue: string): string {
   return `${brokerObjectName(broker)},component=addresses,address=*,subcomponent=queues,routing-type=*,queue=${quote(queue)}`;
 }
 
+export async function discoverBrokerName(client: JolokiaClient): Promise<string> {
+  const matches = await client.search('org.apache.activemq.artemis:broker=*');
+  const first = matches[0];
+  const name = first ? /broker="([^"]+)"/.exec(first)?.[1] : undefined;
+  if (!name) {
+    throw new JolokiaError('No Artemis broker MBean found at the Jolokia endpoint');
+  }
+  return name;
+}
+
 export async function resolveQueueMBean(
   client: JolokiaClient,
   broker: string,

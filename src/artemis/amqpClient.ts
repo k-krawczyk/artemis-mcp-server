@@ -1,4 +1,5 @@
 import { createRequire } from 'node:module';
+import type * as Rhea from 'rhea';
 import type { AmqpError, Connection, ConnectionOptions, EventContext, Message } from 'rhea';
 import type { AmqpConfig } from '../config.js';
 import { AmqpOperationError } from '../errors.js';
@@ -8,7 +9,7 @@ import { logger } from '../logger.js';
 // createRequire keeps both the types and the runtime resolution correct under
 // NodeNext without bundling assumptions.
 const nodeRequire = createRequire(import.meta.url);
-const rhea = nodeRequire('rhea') as typeof import('rhea');
+const rhea = nodeRequire('rhea') as typeof Rhea;
 
 export interface SendOptions {
   address: string;
@@ -214,7 +215,11 @@ function parseMessage(message: Message): ReceivedMessage {
     rendered = body.toString('base64');
   } else if (typeof body === 'string') {
     rendered = body;
-  } else if (body && typeof body === 'object' && Buffer.isBuffer((body as { content?: unknown }).content)) {
+  } else if (
+    body &&
+    typeof body === 'object' &&
+    Buffer.isBuffer((body as { content?: unknown }).content)
+  ) {
     encoding = 'base64';
     rendered = (body as { content: Buffer }).content.toString('base64');
   } else {
@@ -227,13 +232,13 @@ function parseMessage(message: Message): ReceivedMessage {
     ...(message.durable !== undefined ? { durable: message.durable } : {}),
     bodyEncoding: encoding,
     body: rendered,
-    properties: (message.application_properties as Record<string, unknown>) ?? {},
+    properties: message.application_properties ?? {},
   };
 }
 
 function conditionOf(error: Error | AmqpError | undefined): string | undefined {
   if (error && typeof error === 'object' && 'condition' in error) {
-    return (error as AmqpError).condition;
+    return error.condition;
   }
   return undefined;
 }

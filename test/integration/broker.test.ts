@@ -36,7 +36,11 @@ describe('artemis broker integration', () => {
 
   beforeAll(async () => {
     container = await new GenericContainer('apache/activemq-artemis:latest-alpine')
-      .withEnvironment({ ARTEMIS_USER: USER, ARTEMIS_PASSWORD: PASSWORD })
+      .withEnvironment({
+        ARTEMIS_USER: USER,
+        ARTEMIS_PASSWORD: PASSWORD,
+        EXTRA_ARGS: '--http-host 0.0.0.0 --relax-jolokia',
+      })
       .withExposedPorts(5672, 8161)
       .withWaitStrategy(Wait.forLogMessage(/Server is now live/, 1))
       .withStartupTimeout(180_000)
@@ -105,7 +109,10 @@ describe('artemis broker integration', () => {
   it('browses without removing the message', async () => {
     const browsed = await call(ctx, 'browse_messages', { queue: 'orders', limit: 10 });
     expect(browsed.count).toBe(1);
-    const messages = browsed.messages as Array<{ body: string; properties: Record<string, unknown> }>;
+    const messages = browsed.messages as Array<{
+      body: string;
+      properties: Record<string, unknown>;
+    }>;
     expect(messages[0]?.body).toBe('hello');
     expect(messages[0]?.properties.priority).toBe(9);
 

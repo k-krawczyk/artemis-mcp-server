@@ -53,7 +53,8 @@ const moveMessages = defineTool({
 const deleteMessages = defineTool({
   name: 'delete_messages',
   title: 'Delete messages',
-  description: 'Remove messages matching a filter. A filter is required to avoid purging the queue.',
+  description:
+    'Remove messages matching a filter. A filter is required to avoid purging the queue.',
   destructive: true,
   input: {
     queue: queueName,

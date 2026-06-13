@@ -118,6 +118,8 @@ describe('resolveQueueMBean', () => {
   it('throws when the queue cannot be found', async () => {
     vi.stubGlobal('fetch', mockFetch({ ok: true, status: 200, body: { status: 200, value: [] } }));
     const client = new JolokiaClient(config);
-    await expect(resolveQueueMBean(client, '0.0.0.0', 'ghost')).rejects.toBeInstanceOf(JolokiaError);
+    await expect(resolveQueueMBean(client, '0.0.0.0', 'ghost')).rejects.toBeInstanceOf(
+      JolokiaError,
+    );
   });
 });

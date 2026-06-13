@@ -1,0 +1,14 @@
+services:
+  artemis:
+    image: apache/activemq-artemis:latest-alpine
+    container_name: artemis
+    environment:
+      ARTEMIS_USER: artemis
+      ARTEMIS_PASSWORD: artemis
+      # --relax-jolokia lets the Jolokia endpoint accept requests that do not
+      # originate from the console origin, which is what this server needs.
+      EXTRA_ARGS: --http-host 0.0.0.0 --relax-jolokia
+    ports:
+      - '5672:5672'
+      - '61616:61616'
+      - '8161:8161'

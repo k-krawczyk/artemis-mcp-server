@@ -56,8 +56,7 @@ const getBrokerOverview = defineTool({
   async handler(_args, ctx) {
     const broker = brokerObjectName(ctx.config.brokerName);
     const attrs = await ctx.jolokia.read<Record<string, unknown>>(broker);
-    const queues = await ctx.jolokia.exec<string[]>(broker, 'getQueueNames');
-    const addresses = await ctx.jolokia.exec<string[]>(broker, 'getAddressNames');
+    const queues = await ctx.jolokia.exec<string[]>(broker, 'getQueueNames', ['']);
     return {
       version: asString(attrs.Version),
       uptime: asString(attrs.Uptime),
@@ -67,7 +66,7 @@ const getBrokerOverview = defineTool({
       totalConsumerCount: asNumber(attrs.TotalConsumerCount),
       totalMessageCount: asNumber(attrs.TotalMessageCount),
       queueCount: queues.length,
-      addressCount: addresses.length,
+      addressCount: asNumber(attrs.AddressCount) ?? 0,
     };
   },
 });

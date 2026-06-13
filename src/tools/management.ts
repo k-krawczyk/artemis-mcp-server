@@ -17,6 +17,7 @@ const listQueues = defineTool({
     const queues = await ctx.jolokia.exec<string[]>(
       brokerObjectName(ctx.config.brokerName),
       'getQueueNames',
+      [''],
     );
     return { count: queues.length, queues };
   },
@@ -32,9 +33,9 @@ const listAddresses = defineTool({
     addresses: z.array(z.string()),
   },
   async handler(_args, ctx) {
-    const addresses = await ctx.jolokia.exec<string[]>(
+    const addresses = await ctx.jolokia.read<string[]>(
       brokerObjectName(ctx.config.brokerName),
-      'getAddressNames',
+      'AddressNames',
     );
     return { count: addresses.length, addresses };
   },

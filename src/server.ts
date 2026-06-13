@@ -1,6 +1,7 @@
 import { createRequire } from 'node:module';
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import type { CallToolResult } from '@modelcontextprotocol/sdk/types.js';
+import { z } from 'zod';
 import { AmqpClient } from './artemis/amqpClient.js';
 import { JolokiaClient } from './artemis/jolokiaClient.js';
 import type { Config } from './config.js';
@@ -32,15 +33,22 @@ export async function runTool(
   context: ToolContext,
 ): Promise<CallToolResult> {
   try {
-    if (tool.destructive && (args as { confirm?: boolean }).confirm !== true) {
+    const parsed = z.object(tool.inputSchema).parse(args ?? {}) as Record<string, unknown>;
+    if (tool.destructive && parsed.confirm !== true) {
       throw new ToolError(`${tool.name} is destructive; pass confirm: true to run it`);
     }
-    const result = await tool.handler(args, context);
+    const result = await tool.handler(parsed, context);
     return {
       content: [{ type: 'text', text: JSON.stringify(result, null, 2) }],
       structuredContent: result as Record<string, unknown>,
     };
   } catch (err) {
+    if (err instanceof z.ZodError) {
+      const detail = err.issues
+        .map((issue) => `${issue.path.join('.') || '(root)'}: ${issue.message}`)
+        .join('; ');
+      return { content: [{ type: 'text', text: `Invalid arguments: ${detail}` }], isError: true };
+    }
     if (!(err instanceof ToolError)) {
       logger.error(`tool ${tool.name} failed`, err);
     }

@@ -1,5 +1,8 @@
 # artemis-mcp-server
 
+[![CI](https://github.com/k-krawczyk/artemis-mcp-server/actions/workflows/ci.yml/badge.svg)](https://github.com/k-krawczyk/artemis-mcp-server/actions/workflows/ci.yml)
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+
 An MCP server that lets an AI agent work with an ActiveMQ Artemis broker. Messaging
 runs over AMQP 1.0; queue management, monitoring and administration run over the
 broker's Jolokia REST endpoint.

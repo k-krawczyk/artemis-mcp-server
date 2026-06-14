@@ -11,6 +11,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- Release workflow that publishes to npm with trusted publishing (OIDC) and
+  generates provenance, triggered when a GitHub release is published.
 - Claude Code plugin marketplace manifest so the server can be installed with
   `/plugin marketplace add` and `/plugin install`, with broker settings collected
   through the plugin's user configuration.

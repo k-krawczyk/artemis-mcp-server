@@ -36,6 +36,12 @@ describe('loadConfig', () => {
     expect(config.jolokia.url).toBe('http://broker:8161/jolokia');
   });
 
+  it('treats empty values as unset and applies defaults', () => {
+    const config = loadConfig({ ...base, ARTEMIS_MODE: '', ARTEMIS_MAX_BROWSE: '' });
+    expect(config.mode).toBe('read-only');
+    expect(config.maxBrowse).toBe(200);
+  });
+
   it('rejects missing required settings', () => {
     expect(() => loadConfig({})).toThrow(/Invalid configuration/);
   });

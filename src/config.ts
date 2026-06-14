@@ -59,7 +59,12 @@ function parseAmqpUrl(raw: string): Pick<AmqpConfig, 'host' | 'port' | 'transpor
 export function loadConfig(env: NodeJS.ProcessEnv = process.env): Config {
   // stdout is reserved for the MCP protocol, so dotenv must not print to it.
   loadEnv({ quiet: true });
-  const parsed = envSchema.safeParse(env);
+  // Treat empty values as unset so optional settings fall back to their defaults;
+  // MCP clients that template configuration often pass through empty strings.
+  const present = Object.fromEntries(
+    Object.entries(env).filter(([, value]) => value !== undefined && value !== ''),
+  );
+  const parsed = envSchema.safeParse(present);
   if (!parsed.success) {
     const issues = parsed.error.issues
       .map((issue) => `  ${issue.path.join('.') || '(root)'}: ${issue.message}`)

@@ -3,6 +3,20 @@
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Added
+
+- Claude Code plugin marketplace manifest so the server can be installed with
+  `/plugin marketplace add` and `/plugin install`, with broker settings collected
+  through the plugin's user configuration.
+- Setup instructions for Codex, Cursor and VS Code.
+
+### Fixed
+
+- Empty environment values are now treated as unset, so optional settings keep their
+  defaults when a client templates configuration with blank strings.
+
 ## [0.1.0] - 2026-06-14
 
 Initial release.

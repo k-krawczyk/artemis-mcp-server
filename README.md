@@ -50,9 +50,48 @@ fail fast at startup with a description of what is wrong.
 
 See `.env.example` for a starting point. The password is never written to the logs.
 
-## Client configuration
+## Using it with an MCP client
 
-Example entry for an MCP client:
+### Claude Code (plugin)
+
+This repository is a Claude Code plugin marketplace. Add it and install the plugin; Claude
+Code prompts for the broker URL, credentials and mode, then runs the server for you:
+
+```
+/plugin marketplace add k-krawczyk/artemis-mcp-server
+/plugin install artemis-mcp-server@artemis-mcp
+```
+
+The password is stored in your system keychain.
+
+### Claude Code (CLI)
+
+Without the plugin, register the server directly:
+
+```
+claude mcp add artemis \
+  --env ARTEMIS_AMQP_URL=amqp://localhost:5672 \
+  --env ARTEMIS_JOLOKIA_URL=http://localhost:8161/console/jolokia \
+  --env ARTEMIS_USER=artemis \
+  --env ARTEMIS_PASSWORD=artemis \
+  --env ARTEMIS_MODE=admin \
+  -- npx -y artemis-mcp-server
+```
+
+### Codex
+
+In `~/.codex/config.toml`:
+
+```toml
+[mcp_servers.artemis]
+command = "npx"
+args = ["-y", "artemis-mcp-server"]
+env = { ARTEMIS_AMQP_URL = "amqp://localhost:5672", ARTEMIS_JOLOKIA_URL = "http://localhost:8161/console/jolokia", ARTEMIS_USER = "artemis", ARTEMIS_PASSWORD = "artemis", ARTEMIS_MODE = "admin" }
+```
+
+### Cursor
+
+In `.cursor/mcp.json` (project) or `~/.cursor/mcp.json` (global):
 
 ```json
 {
@@ -71,6 +110,33 @@ Example entry for an MCP client:
   }
 }
 ```
+
+### VS Code
+
+In `.vscode/mcp.json` (note the `servers` key):
+
+```json
+{
+  "servers": {
+    "artemis": {
+      "command": "npx",
+      "args": ["-y", "artemis-mcp-server"],
+      "env": {
+        "ARTEMIS_AMQP_URL": "amqp://localhost:5672",
+        "ARTEMIS_JOLOKIA_URL": "http://localhost:8161/console/jolokia",
+        "ARTEMIS_USER": "artemis",
+        "ARTEMIS_PASSWORD": "artemis",
+        "ARTEMIS_MODE": "admin"
+      }
+    }
+  }
+}
+```
+
+### Claude Desktop and other clients
+
+Most clients accept the same `mcpServers` shape as Cursor above. Add the `artemis` entry to
+the client's MCP config file (for Claude Desktop, `claude_desktop_config.json`).
 
 ## Tools
 

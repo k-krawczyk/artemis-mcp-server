@@ -1,7 +1,7 @@
 {
   "$schema": "https://json.schemastore.org/claude-code-plugin-manifest.json",
   "name": "artemis-mcp-server",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Work with an ActiveMQ Artemis broker: send/browse/consume messages, manage queues and addresses, read broker stats, and run admin operations.",
   "author": {
     "name": "Karol Krawczyk"
@@ -46,7 +46,7 @@
   "mcpServers": {
     "artemis": {
       "command": "npx",
-      "args": ["-y", "artemis-mcp-server@0.1.0"],
+      "args": ["-y", "artemis-mcp-server@0.1.1"],
       "env": {
         "ARTEMIS_AMQP_URL": "${user_config.amqp_url}",
         "ARTEMIS_JOLOKIA_URL": "${user_config.jolokia_url}",

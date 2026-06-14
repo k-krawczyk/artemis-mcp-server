@@ -3,7 +3,7 @@
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+## [0.1.1] - 2026-06-14
 
 ### Changed
 
@@ -40,4 +40,5 @@ Initial release.
 - Configuration via environment variables with startup validation and secret redaction.
 - Unit tests and a Testcontainers integration suite against a real broker.
 
+[0.1.1]: https://github.com/k-krawczyk/artemis-mcp-server/releases/tag/v0.1.1
 [0.1.0]: https://github.com/k-krawczyk/artemis-mcp-server/releases/tag/v0.1.0

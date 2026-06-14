@@ -13,6 +13,14 @@
   ],
   "license": "MIT",
   "author": "Karol Krawczyk",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/k-krawczyk/artemis-mcp-server.git"
+  },
+  "bugs": {
+    "url": "https://github.com/k-krawczyk/artemis-mcp-server/issues"
+  },
+  "homepage": "https://github.com/k-krawczyk/artemis-mcp-server#readme",
   "type": "module",
   "engines": {
     "node": ">=20"
@@ -40,7 +48,8 @@
     "format:check": "prettier --check .",
     "test": "vitest run --project unit",
     "test:integration": "vitest run --project integration",
-    "test:watch": "vitest"
+    "test:watch": "vitest",
+    "prepublishOnly": "npm run build"
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.29.0",

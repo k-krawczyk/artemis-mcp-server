@@ -1,0 +1,16 @@
+{
+  "name": "artemis-mcp",
+  "description": "ActiveMQ Artemis tooling for MCP clients",
+  "owner": {
+    "name": "Karol Krawczyk"
+  },
+  "plugins": [
+    {
+      "name": "artemis-mcp-server",
+      "source": ".",
+      "description": "Messaging, management, monitoring and administration for ActiveMQ Artemis over AMQP and Jolokia.",
+      "category": "devops",
+      "keywords": ["activemq", "artemis", "amqp", "jolokia", "messaging"]
+    }
+  ]
+}

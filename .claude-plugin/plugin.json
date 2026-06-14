@@ -1,0 +1,59 @@
+{
+  "$schema": "https://json.schemastore.org/claude-code-plugin-manifest.json",
+  "name": "artemis-mcp-server",
+  "version": "0.1.0",
+  "description": "Work with an ActiveMQ Artemis broker: send/browse/consume messages, manage queues and addresses, read broker stats, and run admin operations.",
+  "author": {
+    "name": "Karol Krawczyk"
+  },
+  "homepage": "https://github.com/k-krawczyk/artemis-mcp-server#readme",
+  "repository": "https://github.com/k-krawczyk/artemis-mcp-server",
+  "license": "MIT",
+  "keywords": ["mcp", "activemq", "artemis", "amqp", "jolokia", "messaging"],
+  "userConfig": {
+    "amqp_url": {
+      "type": "string",
+      "title": "AMQP URL",
+      "description": "AMQP endpoint, e.g. amqp://localhost:5672",
+      "required": true
+    },
+    "jolokia_url": {
+      "type": "string",
+      "title": "Jolokia URL",
+      "description": "Jolokia endpoint, e.g. http://localhost:8161/console/jolokia",
+      "required": true
+    },
+    "user": {
+      "type": "string",
+      "title": "Broker user",
+      "description": "Broker username for AMQP and Jolokia",
+      "required": true
+    },
+    "password": {
+      "type": "string",
+      "title": "Broker password",
+      "description": "Broker password",
+      "sensitive": true,
+      "required": true
+    },
+    "mode": {
+      "type": "string",
+      "title": "Mode",
+      "description": "read-only (default) or admin to enable write and destructive tools",
+      "required": false
+    }
+  },
+  "mcpServers": {
+    "artemis": {
+      "command": "npx",
+      "args": ["-y", "artemis-mcp-server@0.1.0"],
+      "env": {
+        "ARTEMIS_AMQP_URL": "${user_config.amqp_url}",
+        "ARTEMIS_JOLOKIA_URL": "${user_config.jolokia_url}",
+        "ARTEMIS_USER": "${user_config.user}",
+        "ARTEMIS_PASSWORD": "${user_config.password}",
+        "ARTEMIS_MODE": "${user_config.mode}"
+      }
+    }
+  }
+}

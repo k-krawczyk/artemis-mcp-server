@@ -5,6 +5,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- Upgraded zod to v4.
+
 ### Added
 
 - Claude Code plugin marketplace manifest so the server can be installed with

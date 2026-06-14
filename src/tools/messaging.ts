@@ -20,7 +20,7 @@ const sendMessage = defineTool({
     ttlMs: z.number().int().positive().optional().describe('Time to live in milliseconds'),
     messageId: z.string().optional(),
     properties: z
-      .record(z.union([z.string(), z.number(), z.boolean()]))
+      .record(z.string(), z.union([z.string(), z.number(), z.boolean()]))
       .optional()
       .describe('Application properties attached to the message'),
   },

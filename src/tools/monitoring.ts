@@ -78,7 +78,7 @@ const listConsumers = defineTool({
   input: {},
   output: {
     count: z.number(),
-    consumers: z.array(z.record(z.unknown())),
+    consumers: z.array(z.record(z.string(), z.unknown())),
   },
   async handler(_args, ctx) {
     const raw = await ctx.jolokia.exec(
@@ -97,7 +97,7 @@ const listConnections = defineTool({
   input: {},
   output: {
     count: z.number(),
-    connections: z.array(z.record(z.unknown())),
+    connections: z.array(z.record(z.string(), z.unknown())),
   },
   async handler(_args, ctx) {
     const raw = await ctx.jolokia.exec(

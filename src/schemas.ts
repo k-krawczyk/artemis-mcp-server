@@ -23,5 +23,5 @@ export const receivedMessage = z.object({
   durable: z.boolean().optional(),
   bodyEncoding: z.enum(['text', 'base64']),
   body: z.string(),
-  properties: z.record(z.unknown()),
+  properties: z.record(z.string(), z.unknown()),
 });

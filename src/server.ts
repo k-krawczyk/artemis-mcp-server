@@ -33,7 +33,7 @@ export async function runTool(
   context: ToolContext,
 ): Promise<CallToolResult> {
   try {
-    const parsed = z.object(tool.inputSchema).parse(args ?? {}) as Record<string, unknown>;
+    const parsed = z.object(tool.inputSchema).parse(args ?? {});
     if (tool.destructive && parsed.confirm !== true) {
       throw new ToolError(`${tool.name} is destructive; pass confirm: true to run it`);
     }

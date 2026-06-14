@@ -35,7 +35,8 @@ describe('artemis broker integration', () => {
   let amqp: AmqpClient;
 
   beforeAll(async () => {
-    container = await new GenericContainer('apache/activemq-artemis:latest-alpine')
+    const image = process.env.ARTEMIS_IMAGE ?? 'apache/activemq-artemis:latest-alpine';
+    container = await new GenericContainer(image)
       .withEnvironment({
         ARTEMIS_USER: USER,
         ARTEMIS_PASSWORD: PASSWORD,

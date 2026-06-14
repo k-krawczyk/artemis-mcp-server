@@ -60,6 +60,7 @@ export async function runTool(
 
 export interface ArtemisServer {
   server: McpServer;
+  context: ToolContext;
   close: () => Promise<void>;
 }
 
@@ -89,6 +90,7 @@ export function createServer(config: Config): ArtemisServer {
 
   return {
     server,
+    context,
     close: () => amqp.close(),
   };
 }

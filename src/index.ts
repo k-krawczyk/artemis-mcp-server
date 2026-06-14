@@ -1,4 +1,5 @@
 import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js';
+import { reportBrokerVersion } from './artemis/version.js';
 import { collectSecrets, loadConfig, type Config } from './config.js';
 import { logger, registerSecrets } from './logger.js';
 import { createServer } from './server.js';
@@ -14,10 +15,12 @@ async function main(): Promise<void> {
 
   registerSecrets(collectSecrets(config));
 
-  const { server, close } = createServer(config);
+  const { server, context, close } = createServer(config);
   const transport = new StdioServerTransport();
   await server.connect(transport);
   logger.info('artemis-mcp-server ready on stdio');
+
+  void reportBrokerVersion(context.jolokia, config.brokerName);
 
   let stopping = false;
   const shutdown = async (signal: NodeJS.Signals): Promise<void> => {

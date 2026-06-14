@@ -3,6 +3,20 @@
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Added
+
+- The broker version is read and logged at startup, with a warning when it predates the
+  tested range.
+- CI integration matrix covering ActiveMQ Artemis 2.30 through 2.44.
+- Compatibility section in the README.
+
+### Changed
+
+- `list_queues` and `list_addresses` fall back to legacy Jolokia forms on brokers that
+  lack the current operations.
+
 ## [0.1.1] - 2026-06-14
 
 ### Changed

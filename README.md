@@ -16,6 +16,21 @@ explicit `confirm: true` argument so an agent cannot delete data by accident.
 - Node.js 20 or newer
 - An Artemis broker with an AMQP acceptor and the web console (Jolokia) enabled
 
+## Compatibility
+
+The server uses AMQP 1.0 and the Jolokia REST API rather than a build-specific client,
+so it is not pinned to one broker release. CI runs the integration suite against these
+ActiveMQ Artemis versions:
+
+| Server | Tested Artemis versions     |
+| ------ | --------------------------- |
+| 0.1.x  | 2.30 – 2.44, and the latest |
+
+The server's version is independent of the broker's; there is no need to keep them in
+step. Older brokers may still work — management calls fall back to legacy Jolokia forms
+where the API changed — but are unverified, and the server logs a warning at startup
+when the broker predates the tested range.
+
 ## Install
 
 Run it directly from a client without installing:

@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { brokerObjectName, resolveQueueMBean } from '../artemis/jolokiaClient.js';
+import { brokerObjectName, listQueueNames, resolveQueueMBean } from '../artemis/jolokiaClient.js';
 import { queueName } from '../schemas.js';
 import { asNumber, asString, parseJsonArray } from './coerce.js';
 import { defineTool, type Tool } from './types.js';
@@ -56,7 +56,7 @@ const getBrokerOverview = defineTool({
   async handler(_args, ctx) {
     const broker = brokerObjectName(ctx.config.brokerName);
     const attrs = await ctx.jolokia.read<Record<string, unknown>>(broker);
-    const queues = await ctx.jolokia.exec<string[]>(broker, 'getQueueNames', ['']);
+    const queues = await listQueueNames(ctx.jolokia, ctx.config.brokerName);
     return {
       version: asString(attrs.Version),
       uptime: asString(attrs.Uptime),

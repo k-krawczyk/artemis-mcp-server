@@ -107,6 +107,39 @@ export function queueSearchPattern(broker: string, queue: string): string {
   return `${brokerObjectName(broker)},component=addresses,address=*,subcomponent=queues,routing-type=*,queue=${quote(queue)}`;
 }
 
+/**
+ * Current Artemis exposes only getQueueNames(routingType); the empty string
+ * returns every queue. Brokers predating that overload are tried with the
+ * legacy no-argument form.
+ */
+export async function listQueueNames(client: JolokiaClient, broker: string): Promise<string[]> {
+  const mbean = brokerObjectName(broker);
+  try {
+    return await client.exec<string[]>(mbean, 'getQueueNames', ['']);
+  } catch (err) {
+    if (err instanceof JolokiaError) {
+      return client.exec<string[]>(mbean, 'getQueueNames', []);
+    }
+    throw err;
+  }
+}
+
+/**
+ * Addresses are read from the AddressNames attribute on current brokers; older
+ * ones are queried through the getAddressNames operation instead.
+ */
+export async function listAddressNames(client: JolokiaClient, broker: string): Promise<string[]> {
+  const mbean = brokerObjectName(broker);
+  try {
+    return await client.read<string[]>(mbean, 'AddressNames');
+  } catch (err) {
+    if (err instanceof JolokiaError) {
+      return client.exec<string[]>(mbean, 'getAddressNames', []);
+    }
+    throw err;
+  }
+}
+
 export async function discoverBrokerName(client: JolokiaClient): Promise<string> {
   const matches = await client.search('org.apache.activemq.artemis:broker=*');
   const first = matches[0];

@@ -3,6 +3,8 @@ import {
   addressObjectName,
   brokerObjectName,
   JolokiaClient,
+  listAddressNames,
+  listQueueNames,
   queueSearchPattern,
   resolveQueueMBean,
 } from '../../src/artemis/jolokiaClient.js';
@@ -102,6 +104,40 @@ describe('ObjectName helpers', () => {
     expect(pattern).toContain('address=*');
     expect(pattern).toContain('routing-type=*');
     expect(pattern).toContain('queue="orders"');
+  });
+});
+
+describe('listQueueNames', () => {
+  it('uses the routing-type overload by default', async () => {
+    const exec = vi.fn().mockResolvedValue(['orders']);
+    const client = { exec } as unknown as JolokiaClient;
+    await expect(listQueueNames(client, '0.0.0.0')).resolves.toEqual(['orders']);
+    expect(exec).toHaveBeenCalledWith(expect.any(String), 'getQueueNames', ['']);
+  });
+
+  it('falls back to the no-argument form for older brokers', async () => {
+    const exec = vi
+      .fn()
+      .mockRejectedValueOnce(new JolokiaError('Invalid number of operation arguments'))
+      .mockResolvedValueOnce(['legacy']);
+    const client = { exec } as unknown as JolokiaClient;
+    await expect(listQueueNames(client, '0.0.0.0')).resolves.toEqual(['legacy']);
+    expect(exec).toHaveBeenNthCalledWith(2, expect.any(String), 'getQueueNames', []);
+  });
+});
+
+describe('listAddressNames', () => {
+  it('reads the AddressNames attribute by default', async () => {
+    const read = vi.fn().mockResolvedValue(['orders']);
+    const client = { read } as unknown as JolokiaClient;
+    await expect(listAddressNames(client, '0.0.0.0')).resolves.toEqual(['orders']);
+  });
+
+  it('falls back to the getAddressNames operation for older brokers', async () => {
+    const read = vi.fn().mockRejectedValue(new JolokiaError('No attribute AddressNames'));
+    const exec = vi.fn().mockResolvedValue(['legacy']);
+    const client = { read, exec } as unknown as JolokiaClient;
+    await expect(listAddressNames(client, '0.0.0.0')).resolves.toEqual(['legacy']);
   });
 });
 

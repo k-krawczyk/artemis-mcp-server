@@ -1,5 +1,10 @@
 import { z } from 'zod';
-import { brokerObjectName, resolveQueueMBean } from '../artemis/jolokiaClient.js';
+import {
+  brokerObjectName,
+  listAddressNames,
+  listQueueNames,
+  resolveQueueMBean,
+} from '../artemis/jolokiaClient.js';
 import { addressName, confirmFlag, queueName, routingType, selector } from '../schemas.js';
 import { asBoolean, asNumber, asString } from './coerce.js';
 import { defineTool, type Tool } from './types.js';
@@ -14,11 +19,7 @@ const listQueues = defineTool({
     queues: z.array(z.string()),
   },
   async handler(_args, ctx) {
-    const queues = await ctx.jolokia.exec<string[]>(
-      brokerObjectName(ctx.config.brokerName),
-      'getQueueNames',
-      [''],
-    );
+    const queues = await listQueueNames(ctx.jolokia, ctx.config.brokerName);
     return { count: queues.length, queues };
   },
 });
@@ -33,10 +34,7 @@ const listAddresses = defineTool({
     addresses: z.array(z.string()),
   },
   async handler(_args, ctx) {
-    const addresses = await ctx.jolokia.read<string[]>(
-      brokerObjectName(ctx.config.brokerName),
-      'AddressNames',
-    );
+    const addresses = await listAddressNames(ctx.jolokia, ctx.config.brokerName);
     return { count: addresses.length, addresses };
   },
 });
